@@ -69,5 +69,8 @@
     "ios": 7,
     "opera": 25,
     "safari": 6
+  },
+  "dependencies": {
+    "gulp": "^3.8.11"
   }
 }
