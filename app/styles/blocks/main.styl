@@ -1,10 +1,10 @@
 .col
-	float left
-	margin-right 20px
-	height 530px
+	display table-cell
+	vertical-align top
+	border-right 20px solid #999
 	background #ddd
 	&:last-child
-		margin-right 0
+		border-right none
 
 .title
 	padding 18px 11px
@@ -14,19 +14,23 @@
 
 .set
 	padding 24px 29px
-	width 290px
+	width 278px
 
 	&__item
 		margin-bottom 10px
 
 	&__label
-		padding-right 19px
+		padding-right 13px
 		font-size 16px
 
 	&__input
 		padding 2px 7px
 		width 58px
 		border none
+		background transparent
+		&:focus
+		&:hover
+			background #fff
 
 	&__btn
 		display inline-block
@@ -36,18 +40,27 @@
 		font-size 18px
 		text-transform uppercase
 		border 1px solid #aaa
+		cursor pointer
 		&:last-child
 			margin-right 0
+		&:hover
+			background #eee
 
 .field
 	padding 10px 30px
 	border-collapse separate
-	border-spacing 3px
+	border-spacing 2px
 
 	&__cell
 		background #fff
-		width 22px
-		height 22px
+		width 25px
+		height 25px
+
+	.wolf
+		background #000
+
+	.hire
+		background #aaa
 
 .info
 	padding 17px 19px
