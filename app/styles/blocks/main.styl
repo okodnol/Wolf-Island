@@ -18,6 +18,8 @@
 
 	&__item
 		margin-bottom 10px
+		&_speed
+			padding-top 13px
 
 	&__label
 		padding-right 13px
@@ -31,10 +33,57 @@
 		&:focus
 		&:hover
 			background #fff
+		&:disabled
+			color #000
+			&:hover
+				background transparent
+
+	&__radiobox
+		padding-top 11px
+
+	&__radio
+		position relative
+		float left
+		display block
+		width 20%
+		height 26px
+		line-height 26px
+		cursor pointer
+		&:checked:before
+			color #000
+			background #ddd
+			cursor default
+		&:checked:hover:before
+			background #ddd
+		&:hover:before
+			background #eee
+		&:first-child:before
+			border none
+		&:before
+			position absolute
+			z-index 10
+			display block
+			width 100%
+			height 100%
+			text-align center
+			color #000
+			background #bbb
+			border-left 1px solid #ddd
+
+	#speed1:before
+		content '0.5 x'
+	#speed2:before
+		content '1 x'
+	#speed3:before
+		content '2 x'
+	#speed4:before
+		content '4 x'
+	#speed5:before
+		content '8 x'
 
 	&__btn
 		display inline-block
-		margin-top 26px
+		margin-top 42px
 		margin-right 12px
 		padding 5px 7px
 		font-size 18px
@@ -48,6 +97,7 @@
 
 .field
 	padding 10px 30px
+	min-width 575px
 	border-collapse separate
 	border-spacing 2px
 
@@ -59,7 +109,7 @@
 	.wolf
 		background #000
 
-	.hire
+	.hare
 		background #aaa
 
 .info

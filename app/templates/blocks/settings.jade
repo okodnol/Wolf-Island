@@ -1,13 +1,18 @@
 .set
 	.set__item
-		label.set__label(for='wolfs') Волков:
-		input.set__input.js-wolfes(id='wolves' type='text' value='40')
+		label.set__label(for='wolves') Волков:
+		input.set__input#wolves(type='text' value='40' maxlength='3')
 	.set__item
-		label.set__label.js-hares(for='hares') Зайцев:
-		input.set__input(id='hares' type='text' value='40')
-	.set__item
-		label.set__label(for='speed') Скорость:
-		input.set__input(id='speed' type='text' value='10')
+		label.set__label(for='hares') Зайцев:
+		input.set__input#hares(type='text' value='40' maxlength='3')
+	.set__item.set__item_speed
+		label.set__label Скорость:
+		.set__radiobox
+			input.set__radio#speed1(type='radio' name='speed' speed=800)
+			input.set__radio#speed2(type='radio' name='speed' speed=400 checked)
+			input.set__radio#speed3(type='radio' name='speed' speed=200)
+			input.set__radio#speed4(type='radio' name='speed' speed=100)
+			input.set__radio#speed5(type='radio' name='speed' speed=50)
 
 	.set__btn.js-start пуск
 	.set__btn.js-pause пауза
