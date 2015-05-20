@@ -155,9 +155,8 @@ $(function () {
 			if (newCell.hasClass('def')) {
 				newCell.removeClass('def').addClass(className);
 				info(className, 'born');
-				console.log(className + ' born');
 				if (className === 'wolf') {
-					newCell.attr('hp', 1);
+					newCell.attr('hp', 1).attr('parity', 0);
 				}
 			}
 		}
@@ -181,12 +180,15 @@ $(function () {
 		wolfCells.each(function () {
 			var
 				hp = parseFloat($(this).attr('hp')),
+				parity = parseFloat($(this).attr('parity')),
 				hunted = hunt($(this));
 
-			$(this).removeClass('wolf').addClass('def').attr('hp', 0);
+			$(this).removeClass('wolf').addClass('def').attr('hp', 0).attr('parity', 0);
 			// если охота удалась
 			if (hunted[0] !== $(this)[0]) {
-				hunted.removeClass('hare').addClass('wolf').attr('hp', hp + 1);
+				hp++;
+				parity++;
+				hunted.removeClass('hare').addClass('wolf').attr('hp', hp).attr('parity', parity);
 				hareCells = field.find('.hare');
 				info('hare', 'dead');
 			} else {
@@ -197,7 +199,7 @@ $(function () {
 				}
 			}
 			// если волк не умер, он может размножиться
-			if (hp > 0.1) {
+			if (hp > 0.1 && parity > 0) {
 				child($(this), 'wolf', 0.05);
 			}
 			wolfCells = field.find('.wolf');
@@ -207,7 +209,9 @@ $(function () {
 	function hare() {
 		hareCells.each(function () {
 			var
-				dhare = 0;
+				dhare = 0,
+				freeNearCells = near($(this)).filter('.def');
+
 			$(this).removeClass('hare').addClass('def');
 			randNearCell($(this)).removeClass('def').addClass('hare');
 			if (child($(this), 'hare', 0.2)) {
@@ -223,7 +227,6 @@ $(function () {
 			message = '';
 
 		if (Math.abs(dwolf) > 0) {
-			console.log('works');
 			message = message + 'волки:' + repeatString('&nbsp;', 5);
 			if (dwolf < 0) {
 				message = message + '-';
