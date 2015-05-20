@@ -150,9 +150,12 @@ $(function () {
 	function child(cell, className, chance) {
 		var chance = chance * 100;
 		if (Math.floor(Math.random() * 100) < chance - 1) {
-			if (near(cell).filter('.def').size()) {
-				var newCell = randNearCell(cell).removeClass('def').addClass(className);
+			// если число попало в первые chance чисел
+			var newCell = randNearCell(cell);
+			if (newCell.hasClass('def')) {
+				newCell.removeClass('def').addClass(className);
 				info(className, 'born');
+				console.log(className + ' born');
 				if (className === 'wolf') {
 					newCell.attr('hp', 1);
 				}
@@ -215,7 +218,7 @@ $(function () {
 	}
 
 	// вывод информации
-	function infoList(dwolf, dhare, eaten) {
+	function infoList(dwolf, dhare) {
 		var
 			message = '';
 
@@ -249,8 +252,7 @@ $(function () {
 		counter = setInterval(function () {
 			var
 				wolfs = wolfCells.size(),
-				hares = hareCells.size(),
-				eaten = 0;
+				hares = hareCells.size();
 
 			if (paused || speedChanged) {
 				clearInterval(counter);
@@ -262,7 +264,7 @@ $(function () {
 			wolf();
 			eaten = hares - hareCells.size();
 			hare();
-			infoList(wolfs - wolfCells.size(), hares - hareCells.size(), eaten);
+			infoList(wolfs - wolfCells.size(), hares - hareCells.size());
 		}, delay);
 	}
 
