@@ -3,12 +3,12 @@ $(function () {
 	var
 		field = $('.js-field'), // поле
 		fieldSize = 20, // длина и ширина поля в клектах
-		wolfInput = $('#wolves'),
-		hareInput = $('#hares'),
+		wolfInput = $('#wolves'), // поле ввода количества волков
+		hareInput = $('#hares'), // поле ввода количества зайцев
 		input = $('.set__input'),
 		radio = $('.set__radio'),
-		wolfCount = wolfInput.val(), // количество волков
-		hareCount = hareInput.val(), // количество зайцев
+		defaultWolfCount = wolfInput.val(), // количество волков
+		defaultHareCount = hareInput.val(), // количество зайцев
 		delay = $('#speed2').attr('speed'), // интервал в мс
 		started = false,
 		paused = true,
@@ -28,7 +28,7 @@ $(function () {
 		field.html(fieldCode);
 	};
 
-	// случайное заполнение поля hareCount зайцами и wolfCount волками
+	// случайное заполнение поля defaultРareCount зайцами и defaultЦolfCount волками
 	randomFillField = function () {
 		var
 			freeCells = [],
@@ -41,13 +41,13 @@ $(function () {
 			}
 		}
 		// добавление класса 'hare' hareCount случайным ячейкам
-		for (i = 0; i < hareCount; i++) {
+		for (i = 0; i < defaultHareCount; i++) {
 			var index = Math.floor(Math.random() * (freeCells.length));
 			$('tr:nth-child(' + freeCells[index][0] + ') td:nth-child(' + freeCells[index][1] + ')').removeClass('def').addClass('hare');
 			freeCells.splice(index, 1);
 		}
 		// добавление класса 'wolf' wolfCount случайным ячейкам
-		for (i = 0; i < wolfCount; i++) {
+		for (i = 0; i < defaultWolfCount; i++) {
 			var index = Math.floor(Math.random() * (freeCells.length));
 			$('tr:nth-child(' + freeCells[index][0] + ') td:nth-child(' + freeCells[index][1] + ')').removeClass('def').addClass('wolf');
 			freeCells.splice(index, 1);
@@ -68,10 +68,10 @@ $(function () {
 		hareCells = field.find('.hare');
 
 		$('.js-info-content').empty();
-		$('.js-wolf-current').text(wolfCount);
+		$('.js-wolf-current').text(defaultWolfCount);
 		$('.js-wolf-born').text(0);
 		$('.js-wolf-dead').text(0);
-		$('.js-hare-current').text(hareCount);
+		$('.js-hare-current').text(defaultHareCount);
 		$('.js-hare-born').text(0);
 		$('.js-hare-dead').text(0);
 	}
@@ -126,11 +126,11 @@ $(function () {
 			index = Math.floor(Math.random() * (nearCells.length));
 			return (nearCells.eq(index));
 	}
-
-	function info(className, eventName) {
+	// обновление информации на справочной панели
+	function info(classType, eventName) {
 		var
-			currentClassName = $('.js-' + className + '-current'),
-			value = parseInt(currentClassName.text()),
+			className = $('.js-' + classType + '-current'),
+			value = parseInt(className.text()),
 			delta = 0;
 
 		if (eventName === 'born') {
@@ -139,23 +139,23 @@ $(function () {
 		if (eventName === 'dead') {
 			delta = -1;
 		}
-		currentClassName.text(value + delta);
+		className.text(value + delta);
 
-		currentClassName = $('.js-' + className + '-' + eventName);
-		value = parseInt(currentClassName.text());
-		currentClassName.text(value + 1);
+		className = $('.js-' + classType + '-' + eventName);
+		value = parseInt(className.text());
+		className.text(value + 1);
 	}
 
-	// добавление класса className одной из соседних клеток cell с вероятностью chance%
-	function child(cell, className, chance) {
+	// добавление класса classType одной из соседних клеток cell с вероятностью chance%
+	function child(cell, classType, chance) {
 		var chance = chance * 100;
 		if (Math.floor(Math.random() * 100) < chance - 1) {
 			// если число попало в первые chance чисел
 			var newCell = randNearCell(cell);
 			if (newCell.hasClass('def')) {
-				newCell.removeClass('def').addClass(className);
-				info(className, 'born');
-				if (className === 'wolf') {
+				newCell.removeClass('def').addClass(classType);
+				info(classType, 'born');
+				if (classType === 'wolf') {
 					newCell.attr('hp', 1).attr('parity', 0);
 				}
 			}
@@ -208,20 +208,14 @@ $(function () {
 	// действия зайца на каждом шаге
 	function hare() {
 		hareCells.each(function () {
-			var
-				dhare = 0,
-				freeNearCells = near($(this)).filter('.def');
-
 			$(this).removeClass('hare').addClass('def');
 			randNearCell($(this)).removeClass('def').addClass('hare');
-			if (child($(this), 'hare', 0.2)) {
-				dhare++;
-			}
+			child($(this), 'hare', 0.2);
 			hareCells = field.find('.hare');
 		});
 	}
 
-	// вывод информации
+	// вывод информации в список
 	function infoList(dwolf, dhare) {
 		var
 			message = '';
@@ -267,7 +261,7 @@ $(function () {
 			wolf();
 			eaten = hares - hareCells.size();
 			hare();
-			infoList( wolfCells.size() - wolfs, hareCells.size() - hares);
+			infoList(wolfCells.size() - wolfs, hareCells.size() - hares);
 		}, delay);
 	}
 
@@ -293,32 +287,46 @@ $(function () {
 		input.prop('disabled', false);
 		initField();
 	});
+
+	input.on('change', function () {
+	});
+
 	// изменение значения поля ввода количества волков
 	wolfInput.on('change', function () {
-		wolfCount = wolfInput.val();
-		if (wolfCount > Math.pow(fieldSize, 2) - hareCount) {
-			wolfCount = Math.pow(fieldSize, 2) - hareCount;
-			wolfInput.val(wolfCount);
+		defaultWolfCount = wolfInput.val();
+		if (defaultWolfCount < 0) {
+			defaultWolfCount = 0;
+			wolfInput.val(0);
 		}
-		$('.js-wolf-current').text(wolfCount);
+		if (defaultWolfCount > Math.pow(fieldSize, 2) - defaultHareCount) {
+			defaultWolfCount = Math.pow(fieldSize, 2) - defaultHareCount;
+			wolfInput.val(defaultWolfCount);
+		}
+		$('.js-wolf-current').text(defaultWolfCount);
 		initField();
 	});
 	// изменение значения поля ввода количества зайцев
 	hareInput.on('change', function () {
-		hareCount = hareInput.val();
-		if (hareCount > Math.pow(fieldSize, 2) - wolfCount) {
-			hareCount = Math.pow(fieldSize, 2) - wolfCount;
-			hareInput.val(hareCount);
+		defaultHareCount = hareInput.val();
+		if (defaultHareCount < 0) {
+			defaultHareCount = 0;
+			hareInput.val(0);
 		}
-		$('.js-hare-current').text(hareCount);
+		if (defaultHareCount > Math.pow(fieldSize, 2) - defaultWolfCount) {
+			defaultHareCount = Math.pow(fieldSize, 2) - defaultWolfCount;
+			hareInput.val(defaultHareCount);
+		}
+		$('.js-hare-current').text(defaultHareCount);
 		initField();
 	});
+
 	// переключение скорости
 	radio.on('click', function () {
 		delay = $(this).attr('speed');
 		speedChanged = true;
 	});
 
+	// переключение режимов блока информации
 	$('.js-switch').on('click', function () {
 		$('.js-toggle').toggleClass('info__active');
 	});
