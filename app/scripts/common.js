@@ -267,7 +267,7 @@ $(function () {
 			wolf();
 			eaten = hares - hareCells.size();
 			hare();
-			infoList(wolfs - wolfCells.size(), hares - hareCells.size());
+			infoList( wolfCells.size() - wolfs, hareCells.size() - hares);
 		}, delay);
 	}
 
