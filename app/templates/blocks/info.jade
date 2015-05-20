@@ -1,4 +1,24 @@
 .info
-	.info__caption Информация:
-	.info__content
-		|9999999999
+	.info__caption.js-switch Статистка:
+
+	.info__list.js-info.js-toggle
+		.js-info-content
+
+	.info-wrapper.info__active.js-toggle
+		.info__group
+			.info__title Волки:
+			.info__titlecount(value = 15).js-wolf-current 15
+		.info__group
+			.info__count(value = 0).js-wolf-born 0
+			.info__countcaption родилось
+			.info__count(value = 0).js-wolf-dead 0
+			.info__countcaption.info__countcaption_high погибло от<br> голода
+	.info-wrapper.info__active.js-toggle
+		.info__group
+			.info__title Зайцы:
+			.info__titlecount(value = 55).js-hare-current 55
+		.info__group
+			.info__count(value = 0).js-hare-born 0
+			.info__countcaption родилось
+			.info__count(value = 0).js-hare-dead 0
+			.info__countcaption съедено

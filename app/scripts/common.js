@@ -23,8 +23,8 @@ $(function () {
 	// построение HTML-кода поля
 	buildField = function () {
 		var
-			rowCode = ('<tr>' + repeatString('<td class=\'field__cell def\'></td>', fieldSize) + '</tr>'),
-			fieldCode = repeatString(rowCode, fieldSize);
+			rowCode = ('<tr>' + repeatString('<td class=\'field__cell def\'></td>', fieldSize + 1) + '</tr>'),
+			fieldCode = repeatString(rowCode, fieldSize + 1);
 		field.html(fieldCode);
 	};
 
@@ -34,8 +34,8 @@ $(function () {
 			freeCells = [],
 			k = 0;
 		// нумерация всех ячеек поля
-		for (var i = 1; i < fieldSize; i++) {
-			for (var j = 1; j < fieldSize; j++) {
+		for (var i = 1; i < fieldSize + 1; i++) {
+			for (var j = 1; j < fieldSize + 1; j++) {
 				freeCells[k] = [i, j];
 				k++;
 			}
@@ -63,9 +63,17 @@ $(function () {
 		// доступ ко всем клеткам поля через одну переменную
 		cells = field.find('td');
 		// все клетки с волками
-		wolfCells = field.find('.wolf').attr('hp', 1);
+		wolfCells = field.find('.wolf').attr('hp', 1).attr('parity', 0);
 		// все клетки с зайцами
 		hareCells = field.find('.hare');
+
+		$('.js-info-content').empty();
+		$('.js-wolf-current').text(wolfCount);
+		$('.js-wolf-born').text(0);
+		$('.js-wolf-dead').text(0);
+		$('.js-hare-current').text(hareCount);
+		$('.js-hare-born').text(0);
+		$('.js-hare-dead').text(0);
 	}
 
 	// находит соседние клетки ячейки cell
@@ -111,7 +119,7 @@ $(function () {
 
 		return (nearCells);
 	}
-	// ссылка на случайно выбранную соседнюю cell ячейку или на неё саму
+	// ссылка на случайно выбранную свободную соседнюю cell ячейку или на неё саму
 	function randNearCell(cell) {
 		var
 			nearCells = near(cell).filter('.def').add(cell),
@@ -119,20 +127,40 @@ $(function () {
 			return (nearCells.eq(index));
 	}
 
-	// добавляет класс className одной из соседних клеток cell с вероятностью chance%
-	function child(cell, className, chance) {
+	function info(className, eventName) {
 		var
-			newCell,
-			chance = chance * 100;
+			currentClassName = $('.js-' + className + '-current'),
+			value = parseInt(currentClassName.text()),
+			delta = 0;
+
+		if (eventName === 'born') {
+			delta = 1;
+		}
+		if (eventName === 'dead') {
+			delta = -1;
+		}
+		currentClassName.text(value + delta);
+
+		currentClassName = $('.js-' + className + '-' + eventName);
+		value = parseInt(currentClassName.text());
+		currentClassName.text(value + 1);
+	}
+
+	// добавление класса className одной из соседних клеток cell с вероятностью chance%
+	function child(cell, className, chance) {
+		var chance = chance * 100;
 		if (Math.floor(Math.random() * 100) < chance - 1) {
-			newCell = randNearCell(cell).removeClass('def').addClass(className);
-			if (className === 'wolf') {
-				newCell.attr('hp', 1);
-				console.log('init');
+			if (near(cell).filter('.def').size()) {
+				var newCell = randNearCell(cell).removeClass('def').addClass(className);
+				info(className, 'born');
+				if (className === 'wolf') {
+					newCell.attr('hp', 1);
+				}
 			}
 		}
 	}
-
+	// ссылка на случайную клетку с классом 'hare' соседнюю cell
+	// если рядом нет клеток с таким классам, ссылка на саму cell
 	function hunt(cell) {
 		var
 			hares = near(cell).filter('.hare');
@@ -144,23 +172,25 @@ $(function () {
 			return (cell);
 		}
 	}
+
 	// действия волка на каждом шаге
 	function wolf() {
 		wolfCells.each(function () {
 			var
 				hp = parseFloat($(this).attr('hp')),
 				hunted = hunt($(this));
+
 			$(this).removeClass('wolf').addClass('def').attr('hp', 0);
+			// если охота удалась
 			if (hunted[0] !== $(this)[0]) {
-				// если охота удалась
-				console.log('ate', hp + 1);
 				hunted.removeClass('hare').addClass('wolf').attr('hp', hp + 1);
 				hareCells = field.find('.hare');
+				info('hare', 'dead');
 			} else {
-				// если охота не удалась
-				console.log('starve', hp - 0.1);
 				if (hp > 0.1) {
 					randNearCell($(this)).removeClass('def').addClass('wolf').attr('hp', hp - 0.1);
+				} else {
+					info('wolf', 'dead');
 				}
 			}
 			// если волк не умер, он может размножиться
@@ -173,17 +203,55 @@ $(function () {
 	// действия зайца на каждом шаге
 	function hare() {
 		hareCells.each(function () {
+			var
+				dhare = 0;
 			$(this).removeClass('hare').addClass('def');
 			randNearCell($(this)).removeClass('def').addClass('hare');
-			child($(this), 'hare', 0.2);
+			if (child($(this), 'hare', 0.2)) {
+				dhare++;
+			}
 			hareCells = field.find('.hare');
 		});
 	}
+
+	// вывод информации
+	function infoList(dwolf, dhare, eaten) {
+		var
+			message = '';
+
+		if (Math.abs(dwolf) > 0) {
+			console.log('works');
+			message = message + 'волки:' + repeatString('&nbsp;', 5);
+			if (dwolf < 0) {
+				message = message + '-';
+			} else {
+				message = message + '+';
+			}
+			message = message + Math.abs(dwolf) + repeatString('&nbsp;', 10);
+		}
+		if (Math.abs(dhare) > 0) {
+			message = message + 'зайцы:' + repeatString('&nbsp;', 5);
+			if (dhare < 0) {
+				message = message + '-';
+			} else {
+				message = message + '+';
+			}
+			message = message + Math.abs(dhare);
+		}
+		if (message !== '') {
+			$('.js-info-content').append('<div class="info__message">' + message + '</div>');
+		}
+		$('.js-info').scrollTop($('.js-info-content').height());
+	}
+
 	// запуск действий волков и зайцев с интервалом delay мс
 	function action() {
 		counter = setInterval(function () {
-			wolf();
-			hare();
+			var
+				wolfs = wolfCells.size(),
+				hares = hareCells.size(),
+				eaten = 0;
+
 			if (paused || speedChanged) {
 				clearInterval(counter);
 				if (speedChanged) {
@@ -191,8 +259,13 @@ $(function () {
 					speedChanged = false;
 				}
 			}
+			wolf();
+			eaten = hares - hareCells.size();
+			hare();
+			infoList(wolfs - wolfCells.size(), hares - hareCells.size(), eaten);
 		}, delay);
 	}
+
 	// кнопка "пуск"
 	$('.js-start').on('click', function () {
 		if (!started || paused) {
@@ -222,6 +295,7 @@ $(function () {
 			wolfCount = Math.pow(fieldSize, 2) - hareCount;
 			wolfInput.val(wolfCount);
 		}
+		$('.js-wolf-current').text(wolfCount);
 		initField();
 	});
 	// изменение значения поля ввода количества зайцев
@@ -231,12 +305,17 @@ $(function () {
 			hareCount = Math.pow(fieldSize, 2) - wolfCount;
 			hareInput.val(hareCount);
 		}
+		$('.js-hare-current').text(hareCount);
 		initField();
 	});
 	// переключение скорости
 	radio.on('click', function () {
 		delay = $(this).attr('speed');
 		speedChanged = true;
+	});
+
+	$('.js-switch').on('click', function () {
+		$('.js-toggle').toggleClass('info__active');
 	});
 
 	// первоначальный запуск

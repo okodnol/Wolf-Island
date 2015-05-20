@@ -115,15 +115,55 @@
 .info
 	padding 17px 19px
 	width 300px
+	&__active
+		display block !important
 
 	&__caption
+		display inline-block
 		margin-bottom 17px
 		padding-left 8px
 		font-size 18px
+		cursor pointer
 
-	&__content
-		min-height 393px
+	&__group
+		display inline-block
+		vertical-align bottom
+		margin-top 30px
+		width 50%
+
+	&__title
+		font-size 38px
+
+	&__titlecount
+		text-align center
+		font-size 67px
+
+	&__count
+		text-align center
+		font-size 29px
+
+	&__countcaption
+		margin-bottom 4px
+		text-align center
+		font-size 16px
+		&:last-child
+			margin-bottom 0
+		&_high:last-child
+			margin-bottom -16px
+
+	&__list
+		display none
+		padding 23px 25px 7px
+		height 445px
+		overflow-y scroll
+		word-wrap break-word
 		background #fff
 
 	&__message
-		padding-bottom 5px
+		padding-bottom 16px
+
+.info-wrapper
+	display none
+	padding 0 4px
+	font-size 0
+	clearfix()
